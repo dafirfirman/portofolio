@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: var(--font-sans-custom), sans-serif;
+  }
+  
+  /* Menerapkan font mewah (Recoleta/Rose vibe) pada semua Heading */
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif-custom), serif;
+  }
+}
+
+/* Menyembunyikan garis scrollbar global & modal tapi tetap bisa digulir */
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  display: none;
+}

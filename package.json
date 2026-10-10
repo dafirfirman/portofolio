@@ -1,0 +1,30 @@
+{
+  "name": "firman-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "lucide-react": "^1.16.0",
+    "motion": "^12.4.0",
+    "next": "^16.4.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-hook-form": "^7.54.2",
+    "react-icons": "^5.7.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.8",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.7.3"
+  }
+}
