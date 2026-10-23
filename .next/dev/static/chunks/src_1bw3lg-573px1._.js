@@ -3168,9 +3168,35 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 
 __turbopack_context__.s([
     "projectsData",
-    ()=>projectsData
+    ()=>projectsData,
+    "publicationsData",
+    ()=>publicationsData
 ]);
 const projectsData = [
+    {
+        id: "techacademy",
+        title: "TechAcademy - Platform Belajar Coding & AI",
+        category: "Web Application",
+        shortDescription: "Platform edukasi online interaktif untuk belajar koding, AI, cybersecurity, dan pengembangan web dari nol.",
+        image: "/techacademy.png",
+        overview: "TechAcademy menyediakan ekosistem belajar teknologi interaktif dengan kurikulum praktis berbasis proyek nyata untuk membimbing pelajar dari tingkat pemula hingga siap berkarir.",
+        problemStatement: "Banyak pemula kesulitan menemukan platform belajar terstruktur dengan materi modern seputar AI dan cybersecurity.",
+        proposedSolution: "Mengembangkan web platform interaktif berkinerja tinggi menggunakan Next.js dan Tailwind CSS.",
+        keyFeatures: [
+            "Katalog Kursus & Jalur Belajar Interaktif",
+            "Kurikulum Berbasis Proyek Nyata",
+            "Modul Coding, AI, & Cybersecurity",
+            "Desain Responsif & UI/UX Modern"
+        ],
+        technologies: [
+            "Next.js",
+            "React",
+            "Tailwind CSS",
+            "TypeScript"
+        ],
+        demoUrl: "https://tech-academy-ibut-git-main-mr-coding.vercel.app",
+        githubUrl: "https://github.com/dafirfirman/tech-academy"
+    },
     {
         id: "swimpro",
         title: "SwimPro Mobile",
@@ -3258,6 +3284,24 @@ const projectsData = [
             "TypeScript",
             "Tailwind CSS",
             "Scikit-Learn"
+        ]
+    }
+];
+const publicationsData = [
+    {
+        id: "ddos-cross-dataset-paper",
+        title: "Collapse and Recovery of Cross-Dataset DDoS Detection",
+        journalName: "Jurnal Riset Sistem Informasi & Cybersecurity",
+        year: "2026",
+        authors: "Firman Damai Zebua, et al.",
+        abstract: "Evaluasi performa dan generalisasi model Machine Learning (Random Forest & KNN) dalam mendeteksi serangan DDoS lintas dataset (CICDDoS2019, CICIDS2017, CSE-CIC-IDS2018).",
+        scholarUrl: "https://scholar.google.com/citations?user=...",
+        topics: [
+            "Machine Learning",
+            "DDoS Detection",
+            "Random Forest",
+            "KNN",
+            "Cybersecurity"
         ]
     }
 ];

@@ -5,10 +5,10 @@ import Image from "next/image";
 import { 
   Code2, Smartphone, Globe, Server, Cpu, Terminal, 
   ArrowRight, Mail, Send, CheckCircle2, 
-  Menu, X, ExternalLink, MapPin, Layers, GraduationCap, Sparkles, Database, BrainCircuit, Wrench, Briefcase, BookOpen, FileText, Sun, Moon
+  Menu, X, ExternalLink, MapPin, Layers, GraduationCap, Sparkles, Database, BrainCircuit, Wrench, Briefcase, BookOpen, FileText, Sun, Moon,
+  Download, Copy, AlertCircle
 } from "lucide-react";
 
-// Import Ikon Brand Teknologi Resmi dari React Icons/si
 import { 
   SiFlutter, SiDart, SiAndroidstudio, SiNextdotjs, SiReact, 
   SiTypescript, SiJavascript, SiTailwindcss, SiHtml5, SiCss, 
@@ -16,9 +16,8 @@ import {
   SiGit, SiGithub, SiPostman, SiFigma, SiScikitlearn
 } from "react-icons/si";
 
-// Import Ikon Media Sosial dari React Icons/fa
 import { 
-  FaLinkedin, FaYoutube, FaTiktok, FaInstagram, FaGithub 
+  FaLinkedin, FaYoutube, FaTiktok, FaInstagram, FaGithub, FaWhatsapp 
 } from "react-icons/fa";
 
 import { VscCode } from "react-icons/vsc";
@@ -29,7 +28,10 @@ import { profileData } from "../data/profile";
 import { projectsData, Project } from "../data/projects";
 import { PublicationsSection } from "../components/publications";
 
-// Komponen Badge Teknologi dengan Dukungan Light/Dark Mode
+const WA_LINK = "https://api.whatsapp.com/qr/L3BIJYBOS2PVM1?autoload=1&app_absent=0";
+const WA_NUMBER_DISPLAY = "0813-6645-1989";
+const CV_PATH = "/CV-Firman-Damai-Zebua.pdf";
+
 const TechBadge = ({ name, isDark }: { name: string; isDark: boolean }) => {
   const getTechIcon = (techName: string) => {
     switch (techName.toLowerCase()) {
@@ -81,7 +83,6 @@ const TechBadge = ({ name, isDark }: { name: string; isDark: boolean }) => {
   );
 };
 
-// Komponen Animasi Scroll Reveal
 const ScrollReveal = ({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -123,10 +124,12 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [activeCategory, setActiveCategory] = useState<string>("All Projects");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [copiedNumber, setCopiedNumber] = useState<boolean>(false);
 
   // Form State
-  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success">("idle");
-  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
+  const [formStatus, setFormStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "", honeypot: "" });
 
   const categories: string[] = ["All Projects", "Mobile Applications", "Web Development", "Full-Stack"];
 
@@ -134,13 +137,39 @@ export default function Home() {
     ? projectsData 
     : projectsData.filter((p: Project) => p.category === activeCategory);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  // Integrasi Submit Form via API Route Resend
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormStatus("submitting");
-    setTimeout(() => {
-      setFormStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    }, 1200);
+    setErrorMessage("");
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        setFormStatus("success");
+        setFormData({ name: "", email: "", subject: "", message: "", honeypot: "" });
+      } else {
+        setFormStatus("error");
+        setErrorMessage(data.error || (lang === "id" ? "Gagal mengirim pesan. Silakan coba lagi." : "Failed to send message. Please try again."));
+      }
+    } catch (err) {
+      console.error(err);
+      setFormStatus("error");
+      setErrorMessage(lang === "id" ? "Terjadi kesalahan koneksi jaringan." : "A network error occurred.");
+    }
+  };
+
+  const handleCopyWA = () => {
+    navigator.clipboard.writeText("081366451989");
+    setCopiedNumber(true);
+    setTimeout(() => setCopiedNumber(false), 2000);
   };
 
   // Kamus Bahasa (ID & EN)
@@ -151,12 +180,15 @@ export default function Home() {
         greeting: "Halo, Saya",
         bio: "Saya adalah pengembang perangkat lunak dengan latar belakang Teknologi Informasi dan minat kuat dalam membangun produk digital yang bermanfaat. Fokus pekerjaan saya meliputi pengembangan aplikasi mobile, aplikasi web, integrasi API, dan sistem berbasis basis data.",
         explore: "Lihat Portofolio",
-        research: "Publikasi Ilmiah"
+        research: "Publikasi Ilmiah",
+        chatWA: "Hubungi via WhatsApp",
+        downloadCV: "Unduh CV"
       },
       about: {
         badge: "Tentang Saya",
         title: "Mengembangkan solusi teknologi & pendidikan vokasi.",
         desc: "Saat ini saya sedang menempuh studi Magister Teknik Informatika di Universitas Sumatera Utara (USU) setelah menyelesaikan gelar Sarjana di Universitas Katolik Santo Thomas. Selain rekayasa perangkat lunak, saya aktif mengajar sebagai guru kejuruan di SMK Swasta Yapim Biru-Biru pada bidang Koding, Kecerdasan Artifisial, dan Pemrograman Dasar.",
+        downloadCVBtn: "Unduh CV Lengkap",
         c1Title: "Mobile Development",
         c1Desc: "Membangun aplikasi lintas platform menggunakan Flutter & Dart untuk pengalaman native yang mulus.",
         c2Title: "AI & Prompt Engineering",
@@ -179,6 +211,8 @@ export default function Home() {
         badge: "Portofolio",
         title: "Daftar Proyek Aplikasi",
         subtitle: "Jelajahi aplikasi seluler, sistem full-stack, dan alat pembelajaran web.",
+        sourceCode: "Kode Sumber",
+        liveDemo: "Lihat Demo"
       },
       journey: {
         badge: "Timeline",
@@ -207,15 +241,24 @@ export default function Home() {
       contact: {
         badge: "Hubungi",
         title: "Mari Bekerja Sama",
-        subtitle: "Punya proyek, pertanyaan riset, atau ide kolaborasi? Kirimkan pesan.",
+        subtitle: "Punya proyek, pertanyaan riset, atau ide kolaborasi? Kirimkan pesan atau hubungi langsung via WhatsApp.",
+        waBoxTitle: "Respon Cepat via WhatsApp",
+        waBoxDesc: "Klik tombol di bawah ini untuk membuka percakapan langsung di WhatsApp.",
+        chatWABtn: "Hubungi via WhatsApp",
+        copyWA: "Salin Nomor",
+        copiedWA: "Tersalin!",
         nameLabel: "Nama Anda",
+        namePlaceholder: "Masukkan nama lengkap Anda",
         emailLabel: "Alamat Email",
+        emailPlaceholder: "contoh@email.com",
         subjectLabel: "Subjek",
+        subjectPlaceholder: "Kerja Sama Proyek / Pertanyaan Riset",
         messageLabel: "Pesan",
+        messagePlaceholder: "Tuliskan rincian proyek, lini masa, atau pertanyaan Anda di sini...",
         sendBtn: "Kirim Pesan",
-        sending: "Mengirim Pesan...",
-        successTitle: "Pesan Berhasil Terkirim!",
-        successDesc: "Terima kasih telah menghubungi. Saya akan segera membalas pesan Anda.",
+        sending: "Mengirim...",
+        successTitle: "Pesan Terkirim, Terima Kasih!",
+        successDesc: "Terima kasih telah menghubungi. Saya telah menerima pesan Anda dan akan segera membalasnya.",
         sendAnother: "Kirim Pesan Lain"
       }
     },
@@ -225,12 +268,15 @@ export default function Home() {
         greeting: "Hi, I am",
         bio: profileData.bio,
         explore: "Explore My Work",
-        research: "Research Publications"
+        research: "Research Publications",
+        chatWA: "Chat on WhatsApp",
+        downloadCV: "Download CV"
       },
       about: {
         badge: "About",
         title: "Turning technical concepts into reliable applications & education.",
         desc: "I am currently pursuing my Master's Degree in Informatics Engineering at Universitas Sumatera Utara (USU) after completing my Bachelor's degree at Universitas Katolik Santo Thomas. Alongside software engineering, I serve as a vocational teacher at SMK Swasta Yapim Biru-Biru, instructing students in Coding, Artificial Intelligence, and Basic Programming.",
+        downloadCVBtn: "Download Full CV",
         c1Title: "Mobile Development",
         c1Desc: "Building cross-platform apps using Flutter & Dart for smooth native experiences.",
         c2Title: "AI & Prompt Engineering",
@@ -253,6 +299,8 @@ export default function Home() {
         badge: "Portfolio",
         title: "Featured Projects",
         subtitle: "Explore mobile applications, full-stack systems, and web learning tools.",
+        sourceCode: "Source Code",
+        liveDemo: "Live Demo"
       },
       journey: {
         badge: "Timeline",
@@ -281,15 +329,24 @@ export default function Home() {
       contact: {
         badge: "Get in Touch",
         title: "Let's Build Something Together",
-        subtitle: "Have a project in mind, research inquiry, or collaboration idea? Drop a message.",
+        subtitle: "Have a project in mind, research inquiry, or collaboration idea? Drop a message or reach out directly on WhatsApp.",
+        waBoxTitle: "Fast Response via WhatsApp",
+        waBoxDesc: "Click the button below to start a direct chat on WhatsApp.",
+        chatWABtn: "Chat on WhatsApp",
+        copyWA: "Copy Number",
+        copiedWA: "Copied!",
         nameLabel: "Your Name",
+        namePlaceholder: "Enter your full name",
         emailLabel: "Email Address",
+        emailPlaceholder: "john@example.com",
         subjectLabel: "Subject",
+        subjectPlaceholder: "Project Collaboration / Research Inquiry",
         messageLabel: "Message",
+        messagePlaceholder: "Tell me about your project, timeline, or objectives...",
         sendBtn: "Send Message",
-        sending: "Sending Message...",
-        successTitle: "Message Sent Successfully!",
-        successDesc: "Thank you for reaching out. I will get back to you as soon as possible.",
+        sending: "Sending...",
+        successTitle: "Message Sent, Thank You!",
+        successDesc: "Thank you for reaching out. I have received your message and will respond shortly.",
         sendAnother: "Send Another Message"
       }
     }
@@ -300,7 +357,6 @@ export default function Home() {
       isDark ? "bg-[#09090B] text-[#FAFAFA]" : "bg-slate-50 text-slate-900"
     }`}>
       
-      {/* CSS Animasi Waving Hand */}
       <style jsx global>{`
         @keyframes wave {
           0% { transform: rotate(0deg); }
@@ -327,7 +383,7 @@ export default function Home() {
               isDark ? "border-zinc-800 group-hover:border-blue-500" : "border-slate-300 group-hover:border-blue-600"
             }`}>
               <Image 
-                src="/profile.jpeg"
+                src="/new-profile.jpeg"
                 alt="Profile Firman" 
                 width={40} 
                 height={40} 
@@ -339,7 +395,6 @@ export default function Home() {
             </span>
           </a>
 
-          {/* Desktop Links */}
           <div className={`hidden md:flex items-center space-x-6 text-sm font-medium ${
             isDark ? "text-zinc-300" : "text-slate-700"
           }`}>
@@ -355,7 +410,6 @@ export default function Home() {
           </div>
 
           <div className="hidden md:flex items-center space-x-3">
-            {/* Mode Terang / Gelap Switcher */}
             <button
               onClick={() => setIsDark(!isDark)}
               className={`p-2.5 rounded-full border transition-colors ${
@@ -366,7 +420,6 @@ export default function Home() {
               {isDark ? <Sun size={18} /> : <Moon size={18} />}
             </button>
 
-            {/* Language Switcher */}
             <div className={`flex items-center p-1 rounded-full border ${
               isDark ? "bg-zinc-900 border-zinc-800" : "bg-slate-100 border-slate-200"
             }`}>
@@ -393,7 +446,6 @@ export default function Home() {
             </a>
           </div>
 
-          {/* Mobile Menu Toggle */}
           <div className="flex items-center gap-2 md:hidden">
             <button
               onClick={() => setIsDark(!isDark)}
@@ -409,7 +461,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mobile Dropdown */}
         {mobileMenuOpen && (
           <div className={`md:hidden absolute top-20 left-0 right-0 border-b p-6 flex flex-col space-y-4 shadow-2xl ${
             isDark ? "bg-[#111318] border-zinc-800 text-white" : "bg-white border-slate-200 text-slate-900"
@@ -466,21 +517,37 @@ export default function Home() {
               {t[lang].hero.bio}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-4">
-              <a href="#projects" className={`px-7 py-3.5 rounded-xl text-sm font-semibold transition-colors flex items-center space-x-2 ${
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3.5 pt-4">
+              <a href="#projects" className={`w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-semibold transition-colors flex items-center justify-center space-x-2 ${
                 isDark ? "bg-white text-zinc-950 hover:bg-zinc-200" : "bg-slate-900 text-white hover:bg-slate-800"
               }`}>
                 <span>{t[lang].hero.explore}</span>
                 <ArrowRight size={16} />
               </a>
-              <a href="#publications" className="px-7 py-3.5 rounded-xl text-sm font-semibold bg-indigo-600/20 border border-indigo-500/40 text-indigo-500 hover:bg-indigo-600/30 transition-colors flex items-center gap-2">
-                <GraduationCap size={18} />
-                <span>{t[lang].hero.research}</span>
+
+              <a 
+                href={WA_LINK} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20"
+              >
+                <FaWhatsapp size={18} />
+                <span>{t[lang].hero.chatWA}</span>
+              </a>
+
+              <a 
+                href={CV_PATH} 
+                download
+                className={`w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-semibold border transition-colors flex items-center justify-center gap-2 ${
+                  isDark ? "border-zinc-700 text-zinc-200 hover:bg-zinc-800/80 hover:text-white" : "border-slate-300 text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+                }`}
+              >
+                <Download size={16} />
+                <span>{t[lang].hero.downloadCV}</span>
               </a>
             </div>
           </div>
 
-          {/* Terminal / Graphic card */}
           <div className="lg:col-span-5">
             <div className={`rounded-2xl border shadow-2xl p-6 relative overflow-hidden ${
               isDark ? "bg-[#111318] border-zinc-800" : "bg-slate-900 border-slate-800 text-slate-100"
@@ -516,7 +583,7 @@ export default function Home() {
       <section id="about" className="py-24 max-w-7xl mx-auto px-6">
         <ScrollReveal>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            <div className="lg:col-span-5 space-y-4">
+            <div className="lg:col-span-5 space-y-5">
               <div className={`inline-block px-4 py-1.5 border font-mono text-sm tracking-wide ${
                 isDark ? "bg-black border-white text-white" : "bg-slate-900 border-slate-900 text-white"
               }`}>
@@ -528,7 +595,21 @@ export default function Home() {
               <p className={`leading-relaxed text-base ${isDark ? "text-zinc-300" : "text-slate-700"}`}>
                 {t[lang].about.desc}
               </p>
+
+              <div className="pt-2">
+                <a 
+                  href={CV_PATH} 
+                  download
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold border transition-all ${
+                    isDark ? "border-zinc-700 text-zinc-200 hover:bg-zinc-800 hover:text-white" : "border-slate-300 text-slate-800 hover:bg-slate-100"
+                  }`}
+                >
+                  <Download size={16} />
+                  <span>{t[lang].about.downloadCVBtn}</span>
+                </a>
+              </div>
             </div>
+
             <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className={`p-6 rounded-2xl border space-y-3 transition-all ${
                 isDark ? "bg-[#111318] border-zinc-800 hover:border-blue-500/40" : "bg-white border-slate-200 hover:border-blue-500/40 shadow-sm"
@@ -668,7 +749,6 @@ export default function Home() {
               <p className={isDark ? "text-zinc-300" : "text-slate-700"}>{t[lang].projects.subtitle}</p>
             </div>
 
-            {/* Category Filters */}
             <div className="flex flex-wrap gap-2">
               {categories.map((cat: string) => (
                 <button 
@@ -693,17 +773,19 @@ export default function Home() {
             {filteredProjects.map((project: Project) => (
               <div 
                 key={project.id}
-                onClick={() => setSelectedProject(project)}
-                className={`group cursor-pointer rounded-3xl border overflow-hidden transition-all duration-500 flex flex-col justify-between relative hover:-translate-y-2 ${
+                className={`group rounded-3xl border overflow-hidden transition-all duration-500 flex flex-col justify-between relative hover:-translate-y-2 ${
                   isDark 
                     ? "bg-[#111318] border-zinc-800/80 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]" 
                     : "bg-white border-slate-200 shadow-sm hover:border-blue-500/50 hover:shadow-xl"
                 }`}
               >
                 <div>
-                  <div className={`relative w-full h-72 sm:h-80 overflow-hidden border-b flex items-center justify-center p-2 ${
-                    isDark ? "bg-zinc-950 border-zinc-800/80" : "bg-slate-100 border-slate-200"
-                  }`}>
+                  <div 
+                    onClick={() => setSelectedProject(project)}
+                    className={`relative w-full h-72 sm:h-80 overflow-hidden border-b flex items-center justify-center p-2 cursor-pointer ${
+                      isDark ? "bg-zinc-950 border-zinc-800/80" : "bg-slate-100 border-slate-200"
+                    }`}
+                  >
                     <Image
                       src={project.image}
                       alt={project.title[lang]}
@@ -723,9 +805,12 @@ export default function Home() {
                   </div>
 
                   <div className="p-8 space-y-4">
-                    <h4 className={`text-2xl font-bold group-hover:text-blue-500 transition-colors flex items-center justify-between ${
-                      isDark ? "text-white" : "text-slate-900"
-                    }`}>
+                    <h4 
+                      onClick={() => setSelectedProject(project)}
+                      className={`text-2xl font-bold cursor-pointer group-hover:text-blue-500 transition-colors flex items-center justify-between ${
+                        isDark ? "text-white" : "text-slate-900"
+                      }`}
+                    >
                       <span>{project.title[lang]}</span>
                       <Sparkles size={18} className="text-blue-500 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </h4>
@@ -736,10 +821,43 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="px-8 pb-8 pt-2 flex flex-wrap gap-2">
-                  {project.technologies.map((tech: string) => (
-                    <TechBadge key={tech} name={tech} isDark={isDark} />
-                  ))}
+                <div className="px-8 pb-8 space-y-5">
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.map((tech: string) => (
+                      <TechBadge key={tech} name={tech} isDark={isDark} />
+                    ))}
+                  </div>
+
+                  {/* Tombol GitHub dan Live Demo Dinamis */}
+                  <div className="pt-2 flex flex-wrap items-center gap-3">
+                    {project.githubUrl && (
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`px-4 py-2.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-colors ${
+                          isDark 
+                            ? "bg-zinc-900/80 border-zinc-800 text-zinc-200 hover:bg-zinc-800 hover:text-white" 
+                            : "bg-slate-100 border-slate-300 text-slate-800 hover:bg-slate-200"
+                        }`}
+                      >
+                        <FaGithub size={15} />
+                        <span>{t[lang].projects.sourceCode}</span>
+                      </a>
+                    )}
+
+                    {project.demoUrl && (
+                      <a
+                        href={project.demoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2.5 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white flex items-center gap-2 transition-colors shadow-md shadow-blue-500/20"
+                      >
+                        <ExternalLink size={14} />
+                        <span>{t[lang].projects.liveDemo}</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -775,7 +893,6 @@ export default function Home() {
 
           <ScrollReveal delay={200}>
             <div className="space-y-6">
-              {/* 1. Guru SMK Swasta Yapim Biru-Biru */}
               <div className={`p-6 rounded-2xl border flex items-start space-x-4 transition-all ${
                 isDark ? "bg-[#09090B] border-zinc-800 hover:border-emerald-500/40" : "bg-white border-slate-200 hover:border-emerald-500/40 shadow-sm"
               }`}>
@@ -796,7 +913,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 2. Master's at USU */}
               <div className={`p-6 rounded-2xl border flex items-start space-x-4 transition-all ${
                 isDark ? "bg-[#09090B] border-zinc-800 hover:border-blue-500/40" : "bg-white border-slate-200 hover:border-blue-500/40 shadow-sm"
               }`}>
@@ -817,7 +933,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 3. Bachelor's at UNIKA */}
               <div className={`p-6 rounded-2xl border flex items-start space-x-4 transition-all ${
                 isDark ? "bg-[#09090B] border-zinc-800 hover:border-violet-500/40" : "bg-white border-slate-200 hover:border-violet-500/40 shadow-sm"
               }`}>
@@ -838,12 +953,11 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* 4. Freelance */}
               <div className={`p-6 rounded-2xl border flex items-start space-x-4 transition-all ${
                 isDark ? "bg-[#09090B] border-zinc-800 hover:border-amber-500/40" : "bg-white border-slate-200 hover:border-amber-500/40 shadow-sm"
               }`}>
                 <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800/80 p-2 shrink-0 flex items-center justify-center relative overflow-hidden shadow-md">
-                  <Image src="/freelance.png" alt="Logo Freelance" width={44} height={44} className="object-contain" />
+                  <Image src="/freelancer-svgrepo-com.svg" alt="Logo Freelance" width={44} height={44} className="object-contain" />
                 </div>
                 <div className="space-y-1 flex-1">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
@@ -939,12 +1053,52 @@ export default function Home() {
             </div>
           </ScrollReveal>
 
+          <ScrollReveal delay={100}>
+            <div className={`p-6 sm:p-8 rounded-3xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 transition-all ${
+              isDark ? "bg-[#09090B] border-emerald-500/30 shadow-[0_0_20px_rgba(16,185,129,0.05)]" : "bg-white border-emerald-500/40 shadow-sm"
+            }`}>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-emerald-500 font-bold text-lg">
+                  <FaWhatsapp size={22} />
+                  <span>{t[lang].contact.waBoxTitle}</span>
+                </div>
+                <p className={`text-sm ${isDark ? "text-zinc-300" : "text-slate-600"}`}>
+                  {t[lang].contact.waBoxDesc}
+                </p>
+                <div className="flex items-center gap-2 pt-1">
+                  <span className={`font-mono text-base font-semibold ${isDark ? "text-white" : "text-slate-900"}`}>
+                    {WA_NUMBER_DISPLAY}
+                  </span>
+                  <button 
+                    onClick={handleCopyWA}
+                    className={`text-xs px-2.5 py-1 rounded-md border flex items-center gap-1 transition-colors ${
+                      isDark ? "bg-zinc-800 border-zinc-700 text-zinc-300 hover:text-white" : "bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900"
+                    }`}
+                  >
+                    <Copy size={12} />
+                    <span>{copiedNumber ? t[lang].contact.copiedWA : t[lang].contact.copyWA}</span>
+                  </button>
+                </div>
+              </div>
+
+              <a 
+                href={WA_LINK} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors flex items-center justify-center gap-2 shrink-0 shadow-lg shadow-emerald-600/20"
+              >
+                <FaWhatsapp size={18} />
+                <span>{t[lang].contact.chatWABtn}</span>
+              </a>
+            </div>
+          </ScrollReveal>
+
           <ScrollReveal delay={200}>
             <div className={`rounded-3xl border p-8 sm:p-12 shadow-2xl ${
               isDark ? "bg-[#09090B] border-zinc-800" : "bg-white border-slate-200"
             }`}>
               {formStatus === "success" ? (
-                <div className="text-center py-16 space-y-4">
+                <div className="text-center py-12 space-y-4">
                   <div className="w-16 h-16 bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 rounded-full flex items-center justify-center mx-auto">
                     <CheckCircle2 size={32} />
                   </div>
@@ -961,15 +1115,34 @@ export default function Home() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Honeypot field tersembunyi */}
+                  <input
+                    type="text"
+                    name="honeypot"
+                    value={formData.honeypot}
+                    onChange={(e) => setFormData({ ...formData, honeypot: e.target.value })}
+                    style={{ display: "none" }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+
+                  {formStatus === "error" && (
+                    <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-sm flex items-center gap-2">
+                      <AlertCircle size={18} className="shrink-0" />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <label className={`text-xs font-mono uppercase tracking-wider ${isDark ? "text-zinc-300" : "text-slate-700 font-semibold"}`}>{t[lang].contact.nameLabel}</label>
                       <input
                         type="text"
                         required
+                        maxLength={100}
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="John Doe"
+                        placeholder={t[lang].contact.namePlaceholder}
                         className={`w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-500 transition-colors border ${
                           isDark ? "bg-[#111318] border-zinc-800 text-white placeholder:text-zinc-500" : "bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400"
                         }`}
@@ -982,7 +1155,7 @@ export default function Home() {
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@example.com"
+                        placeholder={t[lang].contact.emailPlaceholder}
                         className={`w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-500 transition-colors border ${
                           isDark ? "bg-[#111318] border-zinc-800 text-white placeholder:text-zinc-500" : "bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400"
                         }`}
@@ -995,9 +1168,10 @@ export default function Home() {
                     <input
                       type="text"
                       required
+                      maxLength={150}
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      placeholder="Project Collaboration / Research Inquiry"
+                      placeholder={t[lang].contact.subjectPlaceholder}
                       className={`w-full rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-blue-500 transition-colors border ${
                         isDark ? "bg-[#111318] border-zinc-800 text-white placeholder:text-zinc-500" : "bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400"
                       }`}
@@ -1009,9 +1183,10 @@ export default function Home() {
                     <textarea
                       required
                       rows={5}
+                      maxLength={3000}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Tell me about your project, timeline, or objectives..."
+                      placeholder={t[lang].contact.messagePlaceholder}
                       className={`w-full rounded-xl p-4 text-sm focus:outline-none focus:border-blue-500 transition-colors resize-none border ${
                         isDark ? "bg-[#111318] border-zinc-800 text-white placeholder:text-zinc-500" : "bg-slate-50 border-slate-300 text-slate-900 placeholder:text-slate-400"
                       }`}
@@ -1053,13 +1228,16 @@ export default function Home() {
             <span>© {new Date().getFullYear()} Firman Damai Zebua. All rights reserved.</span>
           </div>
           <div className="flex items-center space-x-6">
-            <a href="https://github.com/dafirfirman" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors">
+            <a href={WA_LINK} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-500 transition-colors" title="Chat on WhatsApp">
+              <FaWhatsapp size={20} />
+            </a>
+            <a href="https://github.com/dafirfirman" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors" title="GitHub">
               <FaGithub size={18} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors">
+            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors" title="LinkedIn">
               <FaLinkedin size={18} />
             </a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors">
+            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-blue-500 transition-colors" title="YouTube">
               <FaYoutube size={18} />
             </a>
           </div>
@@ -1072,7 +1250,6 @@ export default function Home() {
           <div className={`border rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 relative shadow-2xl [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${
             isDark ? "bg-[#111318] border-zinc-800 text-zinc-300" : "bg-white border-slate-200 text-slate-800"
           }`}>
-            {/* Close Button */}
             <button
               onClick={() => setSelectedProject(null)}
               className={`absolute top-6 right-6 w-10 h-10 rounded-full border flex items-center justify-center transition-colors ${
@@ -1141,18 +1318,17 @@ export default function Home() {
               </div>
             </div>
 
-            {/* ACTION BUTTONS */}
             <div className={`pt-4 border-t flex flex-wrap gap-4 ${
               isDark ? "border-zinc-800" : "border-slate-200"
             }`}>
-              {selectedProject.id === "techacademy" && selectedProject.demoUrl && (
+              {selectedProject.demoUrl && (
                 <a
                   href={selectedProject.demoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium text-sm flex items-center space-x-2 transition-colors shadow-lg shadow-blue-500/20"
                 >
-                  <span>Live Demo Platform</span>
+                  <span>{t[lang].projects.liveDemo}</span>
                   <ExternalLink size={16} />
                 </a>
               )}
@@ -1165,7 +1341,7 @@ export default function Home() {
                     isDark ? "bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-white" : "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-800"
                   }`}
                 >
-                  <span>GitHub Repository</span>
+                  <span>{t[lang].projects.sourceCode}</span>
                   <FaGithub size={16} />
                 </a>
               )}

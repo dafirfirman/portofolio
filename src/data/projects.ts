@@ -54,7 +54,7 @@ export const projectsData: Project[] = [
       id: "TechAcademy - Platform Belajar Koding & AI",
       en: "TechAcademy - Coding & AI Learning Platform"
     },
-    category: "Web Application",
+    category: "Web Development",
     shortDescription: {
       id: "Platform edukasi online interaktif untuk belajar koding, AI, cybersecurity, dan pengembangan web dari nol.",
       en: "Interactive online education platform for learning coding, AI, cybersecurity, and web development from scratch."
@@ -128,7 +128,8 @@ export const projectsData: Project[] = [
         "Clean Dark UI"
       ]
     },
-    technologies: ["Flutter", "Dart", "REST APIs", "Provider"]
+    technologies: ["Flutter", "Dart", "REST APIs", "Provider"],
+    githubUrl: "https://github.com/dafirfirman/SwimPro"
   },
   {
     id: "active4c",
@@ -168,7 +169,8 @@ export const projectsData: Project[] = [
         "Custom Charts"
       ]
     },
-    technologies: ["Flutter", "Dart", "API Integration", "GetX"]
+    technologies: ["Flutter", "Dart", "API Integration", "GetX"],
+    githubUrl: "https://github.com/dafirfirman/Activie4C"
   },
   {
     id: "barberon",
@@ -208,7 +210,8 @@ export const projectsData: Project[] = [
         "Admin Dashboard"
       ]
     },
-    technologies: ["Flutter", "PHP", "MySQL", "REST APIs"]
+    technologies: ["Flutter", "PHP", "MySQL", "REST APIs"],
+    githubUrl: "https://github.com/dafirfirman/barberon-app"
   }
 ];
 
