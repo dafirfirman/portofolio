@@ -1476,7 +1476,7 @@ export default function Home() {
             <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="icon-btn" title="LinkedIn">
               <FaLinkedin size={16} />
             </a>
-            <a href="https://youtube.com" target="_blank" rel="noreferrer" className="icon-btn" title="YouTube">
+            <a href="youtube.com/channel/UC1OxwErlO6THN_ZUGSMwZrg" target="_blank" rel="noreferrer" className="icon-btn" title="YouTube">
               <FaYoutube size={16} />
             </a>
           </div>
