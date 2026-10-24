@@ -1473,7 +1473,7 @@ export default function Home() {
             <a href="https://github.com/dafirfirman" target="_blank" rel="noreferrer" className="icon-btn" title="GitHub">
               <FaGithub size={16} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="icon-btn" title="LinkedIn">
+            <a href="https://https://www.linkedin.com/in/firman-damai-zebua-87a113328/?isSelfProfile=true" target="_blank" rel="noreferrer" className="icon-btn" title="LinkedIn">
               <FaLinkedin size={16} />
             </a>
             <a href="youtube.com/channel/UC1OxwErlO6THN_ZUGSMwZrg" target="_blank" rel="noreferrer" className="icon-btn" title="YouTube">
