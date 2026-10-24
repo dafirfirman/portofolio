@@ -538,7 +538,7 @@ const t = {
       items: [
         { role: "Guru SMK", org: "SMK Swasta Yapim Biru-Biru", period: "2026 – Sekarang", desc: "Mengajar Koding, Kecerdasan Artifisial, dan Pemrograman Dasar, lengkap dengan materi dan demo praktik yang saya buat sendiri.", logo: "/yapim.png" },
         { role: "S2 Teknik Informatika", org: "Universitas Sumatera Utara (USU)", period: "2025 – Sekarang", desc: "Meneliti machine learning untuk deteksi serangan DDoS dengan fokus generalisasi lintas dataset.", logo: "/usu.png" },
-        { role: "S1 Ilmu Komputer (S.Kom.)", org: "Universitas Katolik Santo Thomas", period: "Lulus", desc: "Dasar rekayasa perangkat lunak, algoritma, basis data, dan pengembangan full-stack.", logo: "/unika.png" },
+        { role: "S1 Teknik Informatika (S.Kom.)", org: "Universitas Katolik Santo Thomas", period: "Lulus", desc: "Dasar rekayasa perangkat lunak, algoritma, basis data, dan pengembangan full-stack.", logo: "/unika.png" },
         { role: "Freelance Developer", org: "Mobile & Web", period: "Berjalan", desc: "Membangun aplikasi mobile, sistem berbasis REST API, dan dasbor web untuk kebutuhan sekolah dan bisnis.", logo: "/freelancer-svgrepo-com.svg" },
       ],
     },
@@ -631,7 +631,7 @@ const t = {
       items: [
         { role: "Vocational School Teacher", org: "SMK Swasta Yapim Biru-Biru", period: "2026 – Present", desc: "Teaching Coding, Artificial Intelligence, and Basic Programming, with hands-on materials and demos I build myself.", logo: "/yapim.png" },
         { role: "M.Sc. in Informatics", org: "Universitas Sumatera Utara (USU)", period: "2025 – Present", desc: "Researching machine learning for DDoS attack detection, focused on cross-dataset generalization.", logo: "/usu.png" },
-        { role: "B.Sc. in Computer Science (S.Kom.)", org: "Universitas Katolik Santo Thomas", period: "Graduated", desc: "Foundations in software engineering, algorithms, databases, and full-stack development.", logo: "/unika.png" },
+        { role: "B.Sc. in Informatics (S.Kom.)", org: "Universitas Katolik Santo Thomas", period: "Graduated", desc: "Foundations in software engineering, algorithms, databases, and full-stack development.", logo: "/unika.png" },
         { role: "Freelance Developer", org: "Mobile & Web", period: "Ongoing", desc: "Building mobile apps, REST API based systems, and web dashboards for schools and businesses.", logo: "/freelancer-svgrepo-com.svg" },
       ],
     },
