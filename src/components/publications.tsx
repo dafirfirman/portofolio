@@ -1,145 +1,202 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { publicationsData, Publication } from "../data/projects";
-import { BookOpen, ExternalLink, GraduationCap, Sparkles, FileText, Quote, Award } from "lucide-react";
+import { Award, ArrowUpRight, ChevronDown, FileText } from "lucide-react";
 
 interface PublicationsProps {
   lang?: "id" | "en";
   isDark?: boolean;
 }
 
-export function PublicationsSection({ lang = "id", isDark = true }: PublicationsProps) {
-  return (
-    <section className="py-24 max-w-7xl mx-auto px-6 space-y-12">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-3">
-          <div className={`inline-flex items-center gap-2 px-4 py-1.5 border font-mono text-sm tracking-wide ${
-            isDark ? "bg-black border-white text-white" : "bg-slate-900 border-slate-900 text-white"
-          }`}>
-            <GraduationCap size={16} className="text-indigo-400" />
-            <span>{lang === "id" ? "Riset Akademis" : "Academic Research"}</span>
-          </div>
-          <h3 className={`text-3xl sm:text-5xl font-extrabold tracking-tight pt-2 flex items-center gap-3 ${
-            isDark ? "text-white" : "text-slate-900"
-          }`}>
-            <span>{lang === "id" ? "Riset & Publikasi" : "Research & Publications"}</span>
-            <FileText size={36} className="text-indigo-500 hidden sm:inline-block" />
-          </h3>
-          <p className={isDark ? "text-zinc-400" : "text-slate-600"}>
-            {lang === "id"
-              ? "Karya ilmiah, jurnal, dan makalah penelitian seputar Rekayasa Perangkat Lunak, Aplikasi Mobile, dan Machine Learning yang telah dipublikasikan."
-              : "Scientific papers, journals, and research publications focusing on Software Engineering, Mobile Applications, and Machine Learning."}
-          </p>
-        </div>
+const COLLAPSED = 76;
 
-        <div className={`flex items-center gap-2 text-xs font-mono px-4 py-2.5 rounded-full border w-fit shadow-sm ${
-          isDark 
-            ? "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" 
-            : "text-indigo-700 bg-indigo-50 border-indigo-200"
-        }`}>
-          <Award size={16} className={isDark ? "text-indigo-400" : "text-indigo-600"} />
-          <span>Google Scholar Indexed</span>
+const copy = {
+  id: {
+    label: "Riset akademis",
+    title: "Riset & Publikasi",
+    subtitle: "Karya ilmiah seputar rekayasa perangkat lunak, aplikasi mobile, dan machine learning yang telah dipublikasikan.",
+    authors: "Penulis",
+    abstract: "Abstrak",
+    more: "Baca selengkapnya",
+    less: "Tutup",
+    scholar: "Lihat di Google Scholar",
+  },
+  en: {
+    label: "Academic research",
+    title: "Research & Publications",
+    subtitle: "Scientific papers on software engineering, mobile applications, and machine learning that have been published.",
+    authors: "Authors",
+    abstract: "Abstract",
+    more: "Read more",
+    less: "Close",
+    scholar: "View on Google Scholar",
+  },
+};
+
+const Rise = ({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.12 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} style={{ transitionDelay: `${delay}ms` }} className={`reveal ${shown ? "in" : ""} ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+const Abstract = ({ text, more, less }: { text: string; more: string; less: string }) => {
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [full, setFull] = useState(COLLAPSED);
+  const [overflowing, setOverflowing] = useState(false);
+  const [measured, setMeasured] = useState(false);
+
+  useEffect(() => {
+    const measure = () => {
+      const el = boxRef.current;
+      if (!el) return;
+      const h = el.scrollHeight;
+      setFull(h);
+      setOverflowing(h > COLLAPSED + 8);
+      setMeasured(true);
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, [text]);
+
+  const collapsed = overflowing && !open;
+
+  return (
+    <div>
+      <div className="relative">
+        <div
+          ref={boxRef}
+          className="overflow-hidden"
+          style={{
+            maxHeight: !measured ? undefined : collapsed ? COLLAPSED : full,
+            transition: "max-height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1)",
+          }}
+        >
+          <p className="muted text-sm leading-relaxed">{text}</p>
         </div>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-12"
+          style={{
+            background: "linear-gradient(to bottom, transparent, var(--surface))",
+            opacity: collapsed ? 1 : 0,
+            transition: "opacity 0.4s ease",
+          }}
+        />
       </div>
 
-      {/* Publications List */}
-      <div className="space-y-6">
-        {publicationsData.map((pub: Publication) => (
-          <div
-            key={pub.id}
-            className={`group rounded-3xl border p-8 transition-all duration-300 space-y-6 relative overflow-hidden ${
-              isDark 
-                ? "bg-[#111318] border-zinc-800/80 hover:border-indigo-500/50 hover:shadow-[0_0_35px_rgba(99,102,241,0.15)] text-zinc-300" 
-                : "bg-white border-slate-200 shadow-sm hover:border-indigo-500/50 hover:shadow-xl text-slate-700"
-            }`}
-          >
-            {/* Background Glow Effect */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 rounded-full blur-3xl group-hover:bg-indigo-600/10 transition-all pointer-events-none" />
+      {overflowing && (
+        <button
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          className="f-mono accent mt-3 inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.12em]"
+        >
+          <span>{open ? less : more}</span>
+          <ChevronDown size={14} className={`transition-transform duration-500 ${open ? "rotate-180" : ""}`} />
+        </button>
+      )}
+    </div>
+  );
+};
 
-            {/* Top Bar: Journal Info & Link */}
-            <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 ${
-              isDark ? "border-zinc-800/80" : "border-slate-200"
-            }`}>
-              <div className="flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${
-                  isDark ? "bg-indigo-500/10 border-indigo-500/20 text-indigo-400" : "bg-indigo-50 border-indigo-200 text-indigo-600"
-                }`}>
-                  <FileText size={18} />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-mono font-semibold px-3.5 py-1.5 rounded-full border ${
-                    isDark ? "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" : "text-indigo-700 bg-indigo-50 border-indigo-200"
-                  }`}>
-                    {pub.journalName} • {pub.year}
-                  </span>
-                </div>
-              </div>
+export function PublicationsSection({ lang = "id" }: PublicationsProps) {
+  const c = copy[lang];
 
-              <a
-                href={pub.scholarUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-600/20 w-fit hover:scale-105"
-              >
-                <span>Google Scholar</span>
-                <ExternalLink size={14} />
-              </a>
-            </div>
+  if (publicationsData.length === 0) return null;
 
-            {/* Main Content: Title & Authors */}
-            <div className="space-y-3">
-              <h4 className={`text-2xl font-bold group-hover:text-indigo-600 transition-colors flex items-start justify-between gap-3 leading-snug ${
-                isDark ? "text-white" : "text-slate-900"
-              }`}>
-                <span>{pub.title}</span>
-                <Sparkles size={20} className="text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
-              </h4>
-
-              <div className={`flex items-center gap-2 text-sm font-medium px-3.5 py-1.5 rounded-xl border w-fit ${
-                isDark ? "text-indigo-400/90 bg-indigo-950/30 border-indigo-500/10" : "text-indigo-700 bg-indigo-50 border-indigo-200"
-              }`}>
-                <BookOpen size={16} className={isDark ? "text-indigo-400" : "text-indigo-600"} />
-                <span>{lang === "id" ? "Penulis" : "Authors"}: {pub.authors}</span>
-              </div>
-            </div>
-
-            {/* Abstract */}
-            <div className={`p-5 rounded-2xl border space-y-2 relative ${
-              isDark ? "bg-zinc-950/60 border-zinc-800/60" : "bg-slate-50 border-slate-200"
-            }`}>
-              <Quote size={20} className="text-indigo-500/30 absolute top-3 right-4 pointer-events-none" />
-              <span className={`text-xs font-mono uppercase tracking-wider font-semibold block ${
-                isDark ? "text-indigo-400" : "text-indigo-600"
-              }`}>
-                {lang === "id" ? "Abstrak Penelitian" : "Research Abstract"}
-              </span>
-              <p className={`text-sm leading-relaxed italic ${isDark ? "text-zinc-300" : "text-slate-700"}`}>
-                &ldquo;{lang === "id" ? pub.abstract.id : pub.abstract.en}&rdquo;
-              </p>
-            </div>
-
-            {/* Topic Badges */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-              <div className="flex flex-wrap gap-2">
-                {pub.topics.map((topic: string, index: number) => (
-                  <span
-                    key={index}
-                    className={`text-xs font-mono px-3 py-1.5 rounded-lg border transition-colors ${
-                      isDark 
-                        ? "text-zinc-400 bg-zinc-900 border-zinc-800 hover:border-indigo-500/30 hover:text-white" 
-                        : "text-slate-600 bg-slate-100 border-slate-200 hover:border-indigo-300 hover:text-slate-900"
-                    }`}
-                  >
-                    #{topic}
-                  </span>
-                ))}
-              </div>
-            </div>
+  return (
+    <div className="mx-auto max-w-7xl px-6 py-28">
+      <Rise>
+        <p className="label">{c.label}</p>
+        <div className="mt-5 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
+          <div>
+            <h2 className="f-display text-4xl font-bold leading-[1.02] sm:text-6xl">{c.title}</h2>
+            <p className="muted mt-4 max-w-xl">{c.subtitle}</p>
           </div>
+          <span className="chip w-fit">
+            <Award size={14} className="accent" />
+            <span>Google Scholar Indexed</span>
+          </span>
+        </div>
+      </Rise>
+
+      <div className="mt-14 space-y-6">
+        {publicationsData.map((pub: Publication, idx: number) => (
+          <Rise key={pub.id} delay={idx * 110}>
+            <div className="transition-transform duration-500 hover:-translate-y-1">
+              <article className="card group relative p-7 sm:p-9">
+                <span className="absolute inset-x-0 top-0 h-[2px] origin-left scale-x-0 bg-[var(--accent)] transition-transform duration-700 ease-out group-hover:scale-x-100" />
+                <span
+                  aria-hidden="true"
+                  className="f-display pointer-events-none absolute right-6 top-3 select-none text-[6.5rem] font-extrabold leading-none opacity-[0.06]"
+                >
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+
+                <div className="relative">
+                  <span className="chip">
+                    <FileText size={14} className="accent" />
+                    <span>
+                      {pub.journalName} · {pub.year}
+                    </span>
+                  </span>
+
+                  <h3 className="f-display mt-6 max-w-3xl text-2xl font-bold leading-snug transition-colors duration-300 group-hover:text-[var(--accent)] sm:text-3xl">
+                    {pub.title}
+                  </h3>
+
+                  <p className="mt-4 text-sm">
+                    <span className="label mr-2">{c.authors}</span>
+                    <span className="muted">{pub.authors}</span>
+                  </p>
+
+                  <div className="mt-7 border-l-2 pl-5" style={{ borderColor: "var(--accent)" }}>
+                    <span className="label mb-2 block">{c.abstract}</span>
+                    <Abstract text={lang === "id" ? pub.abstract.id : pub.abstract.en} more={c.more} less={c.less} />
+                  </div>
+
+                  <div className="mt-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-wrap gap-2">
+                      {pub.topics.map((topic: string, i: number) => (
+                        <span key={`${topic}-${i}`} className="chip f-mono">
+                          #{topic}
+                        </span>
+                      ))}
+                    </div>
+                    <a href={pub.scholarUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary w-fit shrink-0">
+                      <span>{c.scholar}</span>
+                      <ArrowUpRight size={15} />
+                    </a>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </Rise>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
